@@ -1,0 +1,19 @@
+{
+  "name": "all time",
+  "short_name": "all time",
+  "description": "Count-up timer for ADHD brains. Track how long you spend, not how little time is left.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fafaf9",
+  "theme_color": "#fafaf9",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
