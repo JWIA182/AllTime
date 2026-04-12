@@ -5,9 +5,11 @@
 // switch between them. The deploy workflow sets it via repo secrets/vars.
 const basePath = process.env.BASE_PATH || "";
 
+const isProd = process.env.NODE_ENV === "production";
+
 const nextConfig = {
   output: "export",
-  distDir: "_static",
+  distDir: isProd ? "_static" : ".next",
   images: {
     unoptimized: true,
   },
