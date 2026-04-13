@@ -1,11 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
 import AuthScreen from "../components/AuthScreen";
 import ErrorBoundary from "../components/ErrorBoundary";
-import InsightsTab from "../components/InsightsTab";
 import TaskEditor from "../components/TaskEditor";
-import TasksTab from "../components/TasksTab";
 import TimerTab from "../components/TimerTab";
-import SettingsTab from "../components/SettingsTab";
 import SyncStatusIndicator from "../components/SyncStatusIndicator";
 import { useAuth } from "../lib/auth";
 import { colorForUser } from "../lib/colors";
@@ -33,6 +30,20 @@ import { useTimer } from "../lib/useTimer";
 import { useToast } from "../lib/useToast";
 import { useSyncStatus } from "../lib/useSyncStatus";
 import { useOfflineQueue } from "../lib/useOfflineQueue";
+
+// Lazy load heavy components
+const InsightsTab = lazy(() => import("../components/InsightsTab"));
+const TasksTab = lazy(() => import("../components/TasksTab"));
+const SettingsTab = lazy(() => import("../components/SettingsTab"));
+
+// Loading fallback for lazy components
+function TabLoadingFallback() {
+  return (
+    <div className="page center">
+      <div className="loading" role="status" aria-live="polite">loading…</div>
+    </div>
+  );
+}
 
 /* ===== auth gate ===== */
 
@@ -404,10 +415,10 @@ function AppShell({ user }) {
     [user.id, showToast]
   );
 
-  // Active task
-  const activeTask = tasks.find((t) => t.id === timer.activeTaskId) || null;
+  // Active task (memoized)
+  const activeTask = useMemo(() => tasks.find((t) => t.id === timer.activeTaskId) || null, [tasks, timer.activeTaskId]);
 
-  // Today total
+  // Today total (memoized)
   const todayTotal = useMemo(() => {
     const logged = sessions
       .filter((s) => isToday(s.endedAt))
@@ -415,7 +426,7 @@ function AppShell({ user }) {
     return logged + (timer.activeTaskId ? timer.elapsed : 0);
   }, [sessions, timer.elapsed, timer.activeTaskId]);
 
-  // Per-task today totals
+  // Per-task today totals (memoized)
   const taskTodayMs = useMemo(() => {
     const map = {};
     sessions
@@ -427,7 +438,7 @@ function AppShell({ user }) {
     return map;
   }, [sessions]);
 
-  // Streak
+  // Streak (memoized)
   const streak = useMemo(() => computeStreak(sessions), [sessions]);
 
   // Tab title when timer is not running
@@ -669,42 +680,48 @@ function AppShell({ user }) {
         )}
         {tab === "insights" && (
           <ErrorBoundary name="Insights">
-            <InsightsTab tasks={tasks} sessions={sessions} />
+            <Suspense fallback={<TabLoadingFallback />}>
+              <InsightsTab tasks={tasks} sessions={sessions} />
+            </Suspense>
           </ErrorBoundary>
         )}
         {tab === "tasks" && (
           <ErrorBoundary name="Tasks">
-            <TasksTab
-              user={user}
-              tasks={tasks}
-              sessions={sessions}
-              showToast={showToast}
-              onNew={() => {
-                setEditingTask(null);
-                setTaskEditorOpen(true);
-              }}
-              onExportJSON={handleExportJSON}
-              onImportJSON={handleImportJSON}
-            />
+            <Suspense fallback={<TabLoadingFallback />}>
+              <TasksTab
+                user={user}
+                tasks={tasks}
+                sessions={sessions}
+                showToast={showToast}
+                onNew={() => {
+                  setEditingTask(null);
+                  setTaskEditorOpen(true);
+                }}
+                onExportJSON={handleExportJSON}
+                onImportJSON={handleImportJSON}
+              />
+            </Suspense>
           </ErrorBoundary>
         )}
         {tab === "settings" && (
           <ErrorBoundary name="Settings">
-            <SettingsTab
-              user={user}
-              themePref={themePref}
-              setTheme={setTheme}
-              notifyInterval={notifyInterval}
-              setNotifyInterval={handleNotifyChange}
-              onLogout={handleLogout}
-              onExportJSON={handleExportJSON}
-              onImportJSON={handleImportJSON}
-              showToast={showToast}
-              syncStatus={syncStatus}
-              offlineOps={offlineOps}
-              tasks={tasks}
-              sessions={sessions}
-            />
+            <Suspense fallback={<TabLoadingFallback />}>
+              <SettingsTab
+                user={user}
+                themePref={themePref}
+                setTheme={setTheme}
+                notifyInterval={notifyInterval}
+                setNotifyInterval={handleNotifyChange}
+                onLogout={handleLogout}
+                onExportJSON={handleExportJSON}
+                onImportJSON={handleImportJSON}
+                showToast={showToast}
+                syncStatus={syncStatus}
+                offlineOps={offlineOps}
+                tasks={tasks}
+                sessions={sessions}
+              />
+            </Suspense>
           </ErrorBoundary>
         )}
       </main>

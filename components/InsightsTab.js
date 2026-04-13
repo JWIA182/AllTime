@@ -191,14 +191,15 @@ export default function InsightsTab({ tasks, sessions }) {
     return s.task;
   }
 
-  const now = new Date();
+  // Memoize 'now' to prevent unnecessary recalculations
+  const now = useMemo(() => new Date(), []);
+  
   const periodStart = useMemo(() => {
     if (period === "day") return startOfDay(now);
     if (period === "week") return startOfWeek(now);
     if (period === "month") return startOfMonth(now);
     return startOfYear(now);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [period]);
+  }, [period, now]);
 
   const filtered = useMemo(
     () => sessions.filter((s) => new Date(s.endedAt) >= periodStart),
