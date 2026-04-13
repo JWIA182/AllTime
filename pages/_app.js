@@ -49,19 +49,11 @@ export default function MyApp({ Component, pageProps }) {
           content="width=device-width, initial-scale=1, viewport-fit=cover"
         />
 
-        {/* Theme-color per color scheme (iOS respects the media attr) */}
-        <meta
-          name="theme-color"
-          content="#1a1917"
-          media="(prefers-color-scheme: dark)"
-        />
-        <meta
-          name="theme-color"
-          content="#f5f3ef"
-          media="(prefers-color-scheme: light)"
-        />
+        {/* Theme-color for white theme */}
+        <meta name="theme-color" content="#ffffff" />
 
-        {/* Apply theme before first paint — prevents flash */}
+        {/* iOS status bar - white background */}
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var p=localStorage.getItem('alltime.theme')||'system';var t=p;if(p==='system')t=window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){}})()`,
