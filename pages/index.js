@@ -5,6 +5,8 @@ import InsightsTab from "../components/InsightsTab";
 import TaskEditor from "../components/TaskEditor";
 import TasksTab from "../components/TasksTab";
 import TimerTab from "../components/TimerTab";
+import SettingsTab from "../components/SettingsTab";
+import SyncStatusIndicator from "../components/SyncStatusIndicator";
 import { useAuth } from "../lib/auth";
 import { colorForUser } from "../lib/colors";
 import { firebaseEnabled } from "../lib/firebase";
@@ -23,12 +25,14 @@ import {
   notify,
   requestPermission,
 } from "../lib/notifications";
-import { addSession, subscribeSessions } from "../lib/sessions";
-import { addTask, subscribeTasks } from "../lib/tasks";
+import { addSession, subscribeSessions, removeSession, clearSessions } from "../lib/sessions";
+import { addTask, subscribeTasks, deleteTask, updateTask } from "../lib/tasks";
 import { useBrainDump } from "../lib/useBrainDump";
 import { useIdleDetection } from "../lib/useIdleDetection";
 import { useTimer } from "../lib/useTimer";
 import { useToast } from "../lib/useToast";
+import { useSyncStatus } from "../lib/useSyncStatus";
+import { useOfflineQueue } from "../lib/useOfflineQueue";
 
 /* ===== auth gate ===== */
 
@@ -147,6 +151,21 @@ function AppShell({ user }) {
 
   // --- toast ---
   const { toasts, showToast, dismissToast, handleUndo } = useToast();
+
+  // --- sync status ---
+  const syncStatus = useSyncStatus({ userId: user.id });
+
+  // --- offline queue ---
+  const offlineOps = useOfflineQueue({
+    userId: user.id,
+    operations: {
+      addTask,
+      updateTask,
+      deleteTask,
+      addSession,
+      removeSession,
+    },
+  });
 
   // --- brain dump ---
   const brainDump = useBrainDump(user.id);
@@ -418,6 +437,7 @@ function AppShell({ user }) {
       timer: "AllTime",
       insights: "Insights — AllTime",
       tasks: "Tasks — AllTime",
+      settings: "Settings — AllTime",
     };
     document.title = titles[tab] || "AllTime";
   }, [tab, timer.running]);
@@ -455,6 +475,9 @@ function AppShell({ user }) {
           <h1 className="logo">AllTime</h1>
         </div>
         <div className="header-right">
+          {/* Sync Status Indicator */}
+          <SyncStatusIndicator syncStatus={syncStatus.syncState} />
+          
           <button
             className="icon-btn"
             onClick={() => {
@@ -665,6 +688,25 @@ function AppShell({ user }) {
             />
           </ErrorBoundary>
         )}
+        {tab === "settings" && (
+          <ErrorBoundary name="Settings">
+            <SettingsTab
+              user={user}
+              themePref={themePref}
+              setTheme={setTheme}
+              notifyInterval={notifyInterval}
+              setNotifyInterval={handleNotifyChange}
+              onLogout={handleLogout}
+              onExportJSON={handleExportJSON}
+              onImportJSON={handleImportJSON}
+              showToast={showToast}
+              syncStatus={syncStatus}
+              offlineOps={offlineOps}
+              tasks={tasks}
+              sessions={sessions}
+            />
+          </ErrorBoundary>
+        )}
       </main>
 
       {/* bottom nav */}
@@ -673,6 +715,7 @@ function AppShell({ user }) {
           { id: "timer", icon: "⏱", label: "Timer" },
           { id: "insights", icon: "◧", label: "Insights" },
           { id: "tasks", icon: "⊞", label: "Tasks" },
+          { id: "settings", icon: "⚙", label: "Settings" },
         ].map((t) => (
           <button
             key={t.id}

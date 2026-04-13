@@ -109,6 +109,68 @@ function DonutChart({ segments }) {
   );
 }
 
+/* TrendLineChart - Shows productivity trends over time */
+function TrendLineChart({ data }) {
+  if (!data || data.length === 0) return null;
+  
+  const W = 400;
+  const H = 150;
+  const PAD_T = 20;
+  const PAD_B = 30;
+  const PAD_X = 40;
+  const chartW = W - PAD_X * 2;
+  const chartH = H - PAD_T - PAD_B;
+  
+  const maxVal = Math.max(...data.map(d => d.hours), 1);
+  const points = data.map((d, i) => {
+    const x = PAD_X + (i / (data.length - 1 || 1)) * chartW;
+    const y = PAD_T + chartH - (d.hours / maxVal) * chartH;
+    return { x, y, ...d };
+  });
+  
+  const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+  const areaD = pathD + ` L ${points[points.length - 1].x} ${PAD_T + chartH} L ${points[0].x} ${PAD_T + chartH} Z`;
+
+  return (
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      preserveAspectRatio="xMidYMid meet"
+      className="chart-line"
+      role="img"
+      aria-label="Line chart showing productivity trends"
+    >
+      <defs>
+        <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      
+      {/* Area fill */}
+      <path d={areaD} fill="url(#trendGradient)" />
+      
+      {/* Line */}
+      <path d={pathD} fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      
+      {/* Points */}
+      {points.map((p, i) => (
+        <g key={i}>
+          <circle cx={p.x} cy={p.y} r="3" fill="var(--accent)" />
+          <text
+            x={p.x}
+            y={H - 8}
+            textAnchor="middle"
+            className="chart-label"
+            fontSize="10"
+          >
+            {p.label}
+          </text>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
 /* ===== InsightsTab ===== */
 
 export default function InsightsTab({ tasks, sessions }) {
@@ -148,6 +210,76 @@ export default function InsightsTab({ tasks, sessions }) {
     [filtered]
   );
   const sessionCount = filtered.length;
+
+  // Productivity Score (0-100)
+  const productivityScore = useMemo(() => {
+    if (sessionCount === 0) return 0;
+    
+    const totalHours = totalMs / 3600000;
+    const avgSessionLength = totalHours / sessionCount;
+    
+    // Score based on:
+    // - Total time (40%): Up to 8 hours = 40 points
+    // - Session count (30%): 4-8 sessions = 30 points
+    // - Consistency (30%): Regular sessions across days
+    const timeScore = Math.min(40, (totalHours / 8) * 40);
+    const sessionScore = Math.min(30, (sessionCount / 8) * 30);
+    
+    // Calculate consistency: how many different days have sessions
+    const uniqueDays = new Set(filtered.map(s => startOfDay(new Date(s.endedAt)).toISOString())).size;
+    const expectedDays = period === "day" ? 1 : period === "week" ? 7 : period === "month" ? 30 : 365;
+    const consistencyScore = Math.min(30, (uniqueDays / Math.min(expectedDays, sessionCount)) * 30);
+    
+    return Math.round(timeScore + sessionScore + consistencyScore);
+  }, [totalMs, sessionCount, filtered, period]);
+
+  // Average Session Duration
+  const avgSessionDuration = useMemo(() => {
+    if (sessionCount === 0) return 0;
+    return totalMs / sessionCount;
+  }, [totalMs, sessionCount]);
+
+  // Most Productive Hours
+  const productiveHours = useMemo(() => {
+    const hours = {};
+    filtered.forEach((s) => {
+      const hour = new Date(s.endedAt).getHours();
+      hours[hour] = (hours[hour] || 0) + s.ms;
+    });
+    
+    return Object.entries(hours)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 3)
+      .map(([hour]) => {
+        const h = parseInt(hour);
+        return h === 0 ? "12 AM" : h < 12 ? `${h} AM` : h === 12 ? "12 PM" : `${h - 12} PM`;
+      });
+  }, [filtered]);
+
+  // Weekly Trends (last 8 weeks)
+  const weeklyTrends = useMemo(() => {
+    if (period !== "week" && period !== "month") return [];
+    
+    const weeks = [];
+    for (let i = 7; i >= 0; i--) {
+      const weekStart = startOfWeek(addDays(now, -i * 7));
+      const weekEnd = addDays(weekStart, 7);
+      
+      const weekSessions = sessions.filter(s => {
+        const d = new Date(s.endedAt);
+        return d >= weekStart && d < weekEnd;
+      });
+      
+      const totalWeekMs = weekSessions.reduce((a, s) => a + s.ms, 0);
+      weeks.push({
+        label: `W${8 - i}`,
+        hours: totalWeekMs / 3600000,
+        sessions: weekSessions.length,
+      });
+    }
+    
+    return weeks;
+  }, [sessions, period, now]);
 
   const bestDay = useMemo(() => {
     const days = {};
@@ -272,6 +404,37 @@ export default function InsightsTab({ tasks, sessions }) {
           <div className="stat-label">Sessions</div>
         </div>
       </div>
+
+      {/* Enhanced Stats */}
+      <div className="stats-row enhanced-stats" role="region" aria-label="Advanced Statistics">
+        <div className="stat-card">
+          <div className="stat-value score-value" style={{ color: productivityScore >= 70 ? "var(--accent)" : productivityScore >= 40 ? "#ffc107" : "#ff5722" }}>
+            {productivityScore}
+          </div>
+          <div className="stat-label">Productivity Score</div>
+          <div className="stat-sub">out of 100</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">{formatTotal(avgSessionDuration)}</div>
+          <div className="stat-label">Avg Session</div>
+        </div>
+        {productiveHours.length > 0 && (
+          <div className="stat-card">
+            <div className="stat-value stat-list">{productiveHours.join(", ")}</div>
+            <div className="stat-label">Peak Hours</div>
+          </div>
+        )}
+      </div>
+
+      {/* Weekly Trends Chart */}
+      {weeklyTrends.length > 0 && (
+        <div className="chart-section">
+          <h3 className="chart-title">Weekly Trends (Last 8 Weeks)</h3>
+          <div className="chart-responsive">
+            <TrendLineChart data={weeklyTrends} />
+          </div>
+        </div>
+      )}
 
       {barData.length > 0 && (
         <div className="chart-section">
