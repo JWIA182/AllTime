@@ -1,10 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap");
 
-/* ===== MINIMAL TYPEWRITER THEME ===== */
+/* ===== MINIMAL TYPEWRITER THEME - LIGHT MODE (DEFAULT) ===== */
 
-:root, [data-theme="dark"], [data-theme="light"] {
+:root, [data-theme="light"] {
   --bg: #ffffff;
-  --bg-alt: #fafafa;
+  --bg-alt: #f5f5f5;
   --card: #ffffff;
   --card-raised: #ffffff;
   --fg: #000000;
@@ -16,11 +16,38 @@
   --danger: #cc0000;
   --accent: #000000;
   --surface-1: #ffffff;
-  --surface-2: #fafafa;
-  --surface-3: #f5f5f5;
+  --surface-2: #f5f5f5;
+  --surface-3: #eeeeee;
   --text-muted: #666666;
   --text-secondary: #333333;
   --border: #000000;
+  --radius-sm: 0px;
+  --radius: 0px;
+  --font-mono: "IBM Plex Mono", "Space Mono", "Courier New", monospace;
+  --font-sans: "IBM Plex Mono", monospace;
+}
+
+/* ===== DARK MODE ===== */
+
+[data-theme="dark"] {
+  --bg: #0a0a0a;
+  --bg-alt: #141414;
+  --card: #0a0a0a;
+  --card-raised: #0a0a0a;
+  --fg: #ffffff;
+  --fg-dim: #cccccc;
+  --muted: #888888;
+  --muted-light: #666666;
+  --line: #ffffff;
+  --line-light: #333333;
+  --danger: #ff4444;
+  --accent: #ffffff;
+  --surface-1: #0a0a0a;
+  --surface-2: #141414;
+  --surface-3: #1a1a1a;
+  --text-muted: #888888;
+  --text-secondary: #cccccc;
+  --border: #ffffff;
   --radius-sm: 0px;
   --radius: 0px;
   --font-mono: "IBM Plex Mono", "Space Mono", "Courier New", monospace;

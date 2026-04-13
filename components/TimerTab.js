@@ -57,7 +57,7 @@ export default function TimerTab({
               {timer.running ? (
                 <button
                   className="ctrl-btn"
-                  onClick={() => { haptic(); timer.pause(); }}
+                  onClick={() => { haptic("short"); timer.pause(); }}
                   aria-label="Pause timer"
                 >
                   ❚❚
@@ -65,7 +65,7 @@ export default function TimerTab({
               ) : (
                 <button
                   className="ctrl-btn"
-                  onClick={() => { haptic(); timer.resume(); }}
+                  onClick={() => { haptic("medium"); timer.resume(); }}
                   aria-label="Resume timer"
                 >
                   ▶
@@ -73,7 +73,7 @@ export default function TimerTab({
               )}
               <button
                 className="ctrl-btn stop"
-                onClick={() => { haptic([10, 30, 10]); timer.stopAndSave(); }}
+                onClick={() => { haptic("double"); timer.stopAndSave(); }}
                 aria-label="Stop timer and save session"
               >
                 ■
@@ -163,7 +163,7 @@ export default function TimerTab({
                   {isActive && timer.running ? (
                     <button
                       className="play-btn"
-                      onClick={() => { haptic(); timer.pause(); }}
+                      onClick={() => { haptic("short"); timer.pause(); }}
                       aria-label={`Pause ${task.name}`}
                     >
                       ❚❚
@@ -172,7 +172,7 @@ export default function TimerTab({
                     <button
                       className="play-btn"
                       onClick={() => {
-                        haptic();
+                        haptic(isActive ? "medium" : "success");
                         isActive && !timer.running
                           ? timer.resume()
                           : timer.startTask(task.id);

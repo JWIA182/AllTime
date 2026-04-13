@@ -54,9 +54,11 @@ export default function MyApp({ Component, pageProps }) {
 
         {/* iOS status bar - white background */}
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+        {/* Apply theme before first paint — prevents flash */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var p=localStorage.getItem('alltime.theme')||'system';var t=p;if(p==='system')t=window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){}})()`,
+            __html: `(function(){try{var p=localStorage.getItem('alltime.theme')||'light';var t=p;if(p==='system')t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);if(t==='dark'){document.querySelector('meta[name="theme-color"]').content='#0a0a0a';document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').content='black-translucent';}}catch(e){}})()`,
           }}
         />
 
