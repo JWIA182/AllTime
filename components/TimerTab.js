@@ -262,6 +262,39 @@ export default function TimerTab({
         </div>
       )}
 
+      {/* Quick Start - Recent Tasks */}
+      {tasks.length > 3 && (
+        <div className="quick-start-section">
+          <div className="section-head">
+            <h2>QUICK START</h2>
+          </div>
+          <div className="quick-start-list">
+            {tasks.slice(0, 5).map((task) => {
+              const isActive = task.id === timer.activeTaskId;
+              const cat = task.category ? getCategoryById(task.category) : null;
+              return (
+                <button
+                  key={task.id}
+                  className={`quick-start-btn ${isActive ? "active" : ""}`}
+                  onClick={() => {
+                    haptic(isActive && !timer.running ? "medium" : "success");
+                    isActive && !timer.running
+                      ? timer.resume()
+                      : timer.startTask(task.id);
+                  }}
+                >
+                  {cat && <span className="quick-start-icon">{cat.icon}</span>}
+                  <span className="quick-start-name">{task.name}</span>
+                  {isActive && timer.running && (
+                    <span className="quick-start-badge">●</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* task list */}
       <div className="section-head">
         <h2>YOUR TASKS</h2>

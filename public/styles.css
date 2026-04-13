@@ -865,6 +865,59 @@ ul { list-style: none; }
   font-family: var(--font-mono);
 }
 
+/* Quick Start section */
+.quick-start-section {
+  margin-bottom: 20px;
+}
+
+.quick-start-list {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.quick-start-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--bg);
+  border: 2px solid var(--line);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.quick-start-btn:hover:not(:disabled) {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.quick-start-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.quick-start-btn.active {
+  background: var(--bg-alt);
+  border-color: var(--accent);
+}
+
+.quick-start-icon {
+  font-size: 14px;
+}
+
+.quick-start-name {
+  white-space: nowrap;
+}
+
+.quick-start-badge {
+  color: var(--accent);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
 /* Settings section animation */
 .settings-section {
   animation: sectionFadeIn 0.3s ease-out backwards;
