@@ -10,6 +10,16 @@
   --muted: #7a7670;
   --line: #3a3835;
   --danger: #c47a6a;
+  --accent: #6b9e78;
+  --surface-1: #1a1917;
+  --surface-2: #252422;
+  --surface-3: #302e2b;
+  --text-muted: #7a7670;
+  --text-secondary: #c5c1b8;
+  --border: #3a3835;
+  --radius-sm: 8px;
+  --radius: 12px;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
 }
 
 /* light theme */
@@ -22,6 +32,16 @@
   --muted: #8a8680;
   --line: #d8d5cf;
   --danger: #c44a3a;
+  --accent: #5a8a68;
+  --surface-1: #f5f3ef;
+  --surface-2: #ffffff;
+  --surface-3: #edeae4;
+  --text-muted: #8a8680;
+  --text-secondary: #4a4843;
+  --border: #d8d5cf;
+  --radius-sm: 8px;
+  --radius: 12px;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1458,31 +1478,20 @@ ul { list-style: none; }
   }
 }
 
-/* ========== enhanced mobile responsiveness ========== */
+/* ========== MOBILE-FIRST RESPONSIVE ========== */
 
-/* Improve touch targets on mobile */
+/* ===== Phone (up to 768px) ===== */
 @media (max-width: 768px) {
-  /* Larger touch targets for mobile */
-  .btn, .icon-btn, .nav-btn, .seg-btn {
-    min-height: 44px; /* iOS recommended minimum */
-    padding: 0.75rem 1rem;
+  /* App container */
+  .app {
+    padding: 0 16px;
   }
-  
-  /* Reduce padding in cards for mobile */
-  .stat-card {
-    padding: 1rem;
-  }
-  
-  /* Make charts more responsive */
-  .chart-responsive {
-    margin: 0 -0.5rem;
-  }
-  
-  /* Adjust header for mobile */
+
+  /* Header */
   .app-header {
-    padding: 0.75rem 1rem;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    padding-top: max(16px, env(safe-area-inset-top, 16px));
+    padding-bottom: 12px;
+    gap: 8px;
   }
   
   .header-left {
@@ -1491,164 +1500,491 @@ ul { list-style: none; }
   }
   
   .header-right {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
   
   .logo {
-    font-size: 1.25rem;
+    font-size: 22px;
   }
   
   .date-label {
-    font-size: 0.6875rem;
+    font-size: 10px;
+  }
+
+  /* Sync status - icon only on mobile */
+  .sync-status {
+    padding: 8px;
+    min-width: 36px;
+    justify-content: center;
   }
   
-  /* Bottom nav improvements */
-  .bottom-nav {
-    padding-bottom: env(safe-area-inset-bottom, 0);
+  .sync-status .sync-label {
+    display: none;
+  }
+
+  /* Touch targets - iOS minimum 44px */
+  .btn {
+    min-height: 44px;
+    padding: 12px 18px;
+    font-size: 15px;
   }
   
-  .nav-btn {
+  .btn.small {
+    min-height: 38px;
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+  
+  .icon-btn {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+  }
+  
+  .ctrl-btn {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+  }
+  
+  .play-btn {
+    min-width: 48px;
+    min-height: 48px;
+    width: 48px;
+    height: 48px;
+  }
+  
+  .seg-btn {
+    min-height: 38px;
+    padding: 8px 10px;
+  }
+
+  /* Cards */
+  .stat-card {
+    padding: 14px;
+    min-width: 0;
+  }
+  
+  .stat-value {
+    font-size: 18px;
+  }
+  
+  .stat-label {
+    font-size: 10px;
+  }
+  
+  .task-card,
+  .tm-card {
+    padding: 14px 16px;
+  }
+
+  /* Now tracking banner */
+  .now-tracking {
     flex-direction: column;
-    padding: 0.5rem 0.25rem;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
   }
   
-  .nav-icon {
-    font-size: 1.5rem;
-    margin-bottom: 0.25rem;
+  .nt-right {
+    text-align: left;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
   
-  .nav-label {
-    font-size: 0.6875rem;
+  .nt-timer {
+    font-size: 24px;
   }
   
-  /* Modal adjustments for mobile */
-  .modal-card {
-    width: calc(100vw - 2rem);
-    max-width: none;
-    margin: 1rem;
+  .nt-controls {
+    justify-content: flex-start;
+  }
+
+  /* Stats grid */
+  .stats-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
   
-  /* Task cards on mobile */
-  .task-card {
-    padding: 0.875rem;
+  .enhanced-stats {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  /* Charts */
+  .chart-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -16px;
+    padding: 0 16px;
   }
   
-  /* Insights tabs on mobile */
+  .chart-bar,
+  .chart-line {
+    min-width: 320px;
+  }
+
+  /* Period tabs - horizontal scroll */
   .period-tabs {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    gap: 6px;
   }
   
   .period-tabs::-webkit-scrollbar {
     display: none;
   }
   
-  /* Settings page on mobile */
+  .period-btn {
+    min-height: 44px;
+    white-space: nowrap;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  /* Bottom navigation */
+  .bottom-nav {
+    padding: 8px 12px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 8px));
+    gap: 6px;
+  }
+  
+  .nav-btn {
+    min-height: 56px;
+    padding: 8px 6px;
+  }
+  
+  .nav-icon {
+    font-size: 20px;
+  }
+  
+  .nav-label {
+    font-size: 10px;
+  }
+
+  /* Modals */
+  .modal-overlay {
+    padding: 16px;
+    align-items: flex-end;
+  }
+  
+  .modal-card {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 0;
+    border-radius: 20px 20px 0 0;
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Toast - above bottom nav */
+  .toast-container {
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+    left: 16px;
+    right: 16px;
+    max-width: none;
+  }
+  
+  .toast {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+
+  /* Settings page */
   .settings-page {
-    padding: 1rem 0.75rem;
+    padding: 16px 0;
+  }
+  
+  .settings-page h2 {
+    font-size: 28px;
+    padding: 0 0 16px;
+  }
+  
+  .settings-section {
+    margin-bottom: 24px;
+  }
+  
+  .settings-section h3 {
+    padding: 0 0 12px;
+    font-size: 13px;
   }
   
   .settings-card {
-    padding: 1rem;
+    padding: 16px;
   }
   
-  /* Toast positioning for mobile */
-  .toast-container {
-    bottom: calc(80px + env(safe-area-inset-bottom, 0));
-    left: 1rem;
-    right: 1rem;
+  .setting-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 0;
   }
-}
+  
+  .setting-value {
+    text-align: left;
+    width: 100%;
+  }
+  
+  .setting-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .setting-actions .btn {
+    width: 100%;
+  }
 
-/* Extra small devices */
-@media (max-width: 480px) {
-  .stat-card {
-    min-width: 120px;
-    padding: 0.75rem;
+  /* Cloud backup */
+  .backup-stats {
+    flex-direction: column;
+    gap: 10px;
   }
   
-  .stat-value {
-    font-size: 1.25rem;
+  .backup-actions {
+    flex-direction: column;
+    gap: 10px;
   }
-  
-  .stat-label {
-    font-size: 0.6875rem;
-  }
-  
-  h2.tab-title {
-    font-size: 1.25rem;
-  }
-  
+
+  /* Shortcuts editor */
   .shortcut-row {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
+    padding: 12px;
   }
   
-  .shortcut-key, .shortcut-key-capture {
+  .shortcut-key,
+  .shortcut-key-capture {
     width: 100%;
-    margin-top: 0.5rem;
+    min-height: 44px;
+    margin-top: 0;
+  }
+
+  /* Donut chart */
+  .donut-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+  
+  .donut-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Insights tab */
+  .tab-title {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+
+  /* Tasks tab */
+  .tasks-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  /* iOS install banner */
+  .ios-install-banner {
+    margin: 12px 0;
+    padding: 14px;
+  }
+
+  /* Onboarding */
+  .onboarding {
+    padding: 24px 20px;
+  }
+
+  /* Brain dump */
+  .bd-item {
+    padding: 12px;
+  }
+
+  /* Session items */
+  .si-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  
+  .si-time {
+    align-self: flex-end;
+  }
+
+  /* User menu */
+  .menu-pop {
+    position: fixed;
+    top: auto;
+    right: 16px;
+    left: 16px;
+    min-width: auto;
+    max-width: none;
+  }
+
+  /* Avatar */
+  .avatar {
+    min-width: 40px;
+    min-height: 40px;
   }
 }
 
-/* Landscape mobile */
+/* ===== Small phones (up to 480px) ===== */
+@media (max-width: 480px) {
+  .app {
+    padding: 0 12px;
+  }
+  
+  .logo {
+    font-size: 20px;
+  }
+  
+  .nt-timer {
+    font-size: 20px;
+  }
+  
+  .stat-value {
+    font-size: 16px;
+  }
+  
+  .score-value {
+    font-size: 24px !important;
+  }
+  
+  .tab-title {
+    font-size: 20px;
+  }
+  
+  .nav-btn {
+    padding: 6px 4px;
+  }
+  
+  .nav-label {
+    font-size: 9px;
+  }
+  
+  .settings-page h2 {
+    font-size: 24px;
+  }
+  
+  .modal-card {
+    padding: 20px 16px;
+  }
+  
+  .toast-container {
+    left: 12px;
+    right: 12px;
+  }
+  
+  .chart-responsive {
+    margin: 0 -12px;
+    padding: 0 12px;
+  }
+}
+
+/* ===== Landscape phones ===== */
 @media (max-width: 768px) and (orientation: landscape) {
   .bottom-nav {
-    display: none; /* Hide bottom nav in landscape, use keyboard shortcuts */
+    position: sticky;
+    display: flex;
   }
   
   .tab-content {
-    padding-bottom: 1rem;
+    padding-bottom: 16px;
   }
   
-  .ios-install-banner {
-    position: relative;
-    margin: 0.5rem;
+  .modal-card {
+    max-height: 85vh;
+  }
+  
+  .toast-container {
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px));
   }
 }
 
-/* Tablet optimizations */
+/* ===== Tablets (769px - 1024px) ===== */
 @media (min-width: 769px) and (max-width: 1024px) {
-  .app-header {
-    padding: 1rem 1.5rem;
+  .app {
+    max-width: 700px;
   }
   
-  .tab-content {
-    max-width: 900px;
-    margin: 0 auto;
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .enhanced-stats {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-/* iOS safe area support */
+/* ===== Desktop (1025px+) ===== */
+@media (min-width: 1025px) {
+  .app {
+    max-width: 640px;
+  }
+  
+  .nav-btn:hover:not(.active) {
+    background: var(--card-raised);
+    color: var(--fg-dim);
+  }
+}
+
+/* ===== iOS Safe Area Support ===== */
 @supports (padding: max(0px)) {
   .app {
-    padding-left: env(safe-area-inset-left, 0);
-    padding-right: env(safe-area-inset-right, 0);
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
   }
   
   .bottom-nav {
     padding-left: env(safe-area-inset-left, 0);
     padding-right: env(safe-area-inset-right, 0);
-    padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0));
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
   }
   
   .app-header {
-    padding-left: max(1rem, env(safe-area-inset-left, 1rem));
-    padding-right: max(1rem, env(safe-area-inset-right, 1rem));
-    padding-top: max(1rem, env(safe-area-inset-top, 1rem));
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+    padding-top: max(16px, env(safe-area-inset-top));
+  }
+  
+  .modal-overlay {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
   }
 }
 
-/* Print styles */
+/* ===== Keyboard Open (mobile) ===== */
+.keyboard-open .bottom-nav {
+  display: none;
+}
+
+.keyboard-open .tab-content {
+  padding-bottom: 16px;
+}
+
+.keyboard-open .toast-container {
+  bottom: 16px;
+}
+
+/* ===== Print Styles ===== */
 @media print {
   .bottom-nav,
   .app-header,
   .icon-btn,
   .user-menu,
   .toast-container,
-  .modal-overlay {
+  .modal-overlay,
+  .sync-status {
     display: none !important;
   }
   
@@ -1657,8 +1993,18 @@ ul { list-style: none; }
     color: black;
   }
   
+  .app {
+    max-width: none;
+  }
+  
   .tab-content {
     padding: 0;
+  }
+  
+  .stat-card,
+  .task-card,
+  .chart-section {
+    break-inside: avoid;
   }
 }
 
