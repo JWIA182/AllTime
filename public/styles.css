@@ -907,6 +907,14 @@ ul { list-style: none; }
   text-overflow: ellipsis;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.task-category-icon {
+  font-size: 14px;
+  flex-shrink: 0;
 }
 
 .tc-sub {

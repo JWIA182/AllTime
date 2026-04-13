@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { taskColorPalette } from "../lib/colors";
 import { addTask, updateTask } from "../lib/tasks";
+import { CATEGORIES, getCategoryById } from "../lib/categories";
 
 export default function TaskEditor({ user, task, onClose }) {
   const [name, setName] = useState(task?.name || "");
   const [color, setColor] = useState(task?.color || taskColorPalette[0]);
+  const [category, setCategory] = useState(task?.category || "other");
   const [busy, setBusy] = useState(false);
   const inputRef = useRef(null);
 
@@ -18,9 +20,9 @@ export default function TaskEditor({ user, task, onClose }) {
     setBusy(true);
     try {
       if (task) {
-        await updateTask(user.id, task.id, { name: trimmed, color });
+        await updateTask(user.id, task.id, { name: trimmed, color, category });
       } else {
-        await addTask(user.id, { name: trimmed, color });
+        await addTask(user.id, { name: trimmed, color, category });
       }
       onClose();
     } catch (err) {
@@ -49,8 +51,39 @@ export default function TaskEditor({ user, task, onClose }) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && save()}
+          style={{ textTransform: "none" }}
         />
-        <div className="color-picker" role="radiogroup" aria-label="Task color">
+        
+        {/* Category selector */}
+        <div style={{ marginTop: "12px" }}>
+          <label style={{ display: "block", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "6px" }}>
+            Category
+          </label>
+          <div className="color-picker" role="radiogroup" aria-label="Task category">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.id}
+                className={`color-swatch ${category === cat.id ? "active" : ""}`}
+                style={{ 
+                  background: cat.color,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "16px",
+                }}
+                onClick={() => setCategory(cat.id)}
+                role="radio"
+                aria-checked={category === cat.id}
+                aria-label={cat.name}
+                title={cat.name}
+              >
+                {cat.icon}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="color-picker" role="radiogroup" aria-label="Task color" style={{ marginTop: "12px" }}>
           {taskColorPalette.map((c) => (
             <button
               key={c}

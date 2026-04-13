@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { formatTime, formatTotal, haptic, isToday, startOfDay } from "../lib/formatters";
 import { calculateGoalProgress } from "../lib/goals";
+import { getCategoryById } from "../lib/categories";
 
 // Inline swipe handler to avoid hook rules violation
 function TaskCard({ task, i, isActive, todayMs, timer, onEditTask, taskTodayMs }) {
@@ -58,7 +59,10 @@ function TaskCard({ task, i, isActive, todayMs, timer, onEditTask, taskTodayMs }
       >
         <span className="dot" style={{ background: task.color }} aria-hidden="true" />
         <div className="tc-info">
-          <div className="tc-name">{task.name}</div>
+          <div className="tc-name">
+            {task.category && <span className="task-category-icon">{getCategoryById(task.category).icon}</span>}
+            {task.name}
+          </div>
           <div className="tc-sub">
             {isActive && timer.running ? (
               <span className="running-badge">Running</span>
