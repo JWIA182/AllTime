@@ -96,7 +96,14 @@ export default function TasksTab({ user, tasks, sessions, showToast, onNew, onEx
 
       {tasks.length === 0 ? (
         <div className="empty">
-          <p>no tasks yet — create one to get started</p>
+          <div className="empty-icon" aria-hidden="true">✅</div>
+          <p>no tasks yet</p>
+          <p style={{ fontSize: '11px', opacity: 0.7, marginTop: '8px' }}>
+            create your first task to start tracking
+          </p>
+          <button className="btn primary" onClick={onNew} style={{ marginTop: '16px' }}>
+            + create task
+          </button>
         </div>
       ) : (
         <ul className="task-manage-list" role="list" aria-label="Manage tasks">

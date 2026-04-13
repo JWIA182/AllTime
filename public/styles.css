@@ -645,10 +645,192 @@ ul { list-style: none; }
   display: flex;
   align-items: center;
   justify-content: space-between;
+  transition: background 0.12s, transform 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .task-card:last-child { border-bottom: 2px solid var(--line); }
 .task-card.active { background: var(--bg-alt); }
+
+/* Swipe animations */
+.task-card.swiped-right {
+  animation: swipeRight 0.3s ease-out;
+}
+
+.task-card.swiped-left {
+  animation: swipeLeft 0.3s ease-out;
+}
+
+@keyframes swipeRight {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(10px); background: rgba(0, 255, 0, 0.1); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes swipeLeft {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(-10px); background: rgba(255, 0, 0, 0.1); }
+  100% { transform: translateX(0); }
+}
+
+/* Button press micro-interaction */
+.btn:active:not(:disabled),
+.icon-btn:active,
+.ctrl-btn:active,
+.play-btn:active,
+.nav-btn:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease;
+}
+
+/* Card entrance animation */
+.task-card {
+  animation: cardEntrance 0.3s ease-out backwards;
+}
+
+.task-card:nth-child(1) { animation-delay: 0.05s; }
+.task-card:nth-child(2) { animation-delay: 0.1s; }
+.task-card:nth-child(3) { animation-delay: 0.15s; }
+.task-card:nth-child(4) { animation-delay: 0.2s; }
+.task-card:nth-child(5) { animation-delay: 0.25s; }
+.task-card:nth-child(6) { animation-delay: 0.3s; }
+
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stat card micro-interaction */
+.stat-card {
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.stat-card:active {
+  transform: scale(0.98);
+}
+
+/* Tab transition */
+.tab-content {
+  animation: tabFadeIn 0.2s ease-out;
+}
+
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Toast slide animation */
+.toast {
+  animation: toastSlideIn 0.3s ease-out;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Modal scale animation */
+.modal-card {
+  animation: modalScaleIn 0.2s ease-out;
+}
+
+@keyframes modalScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Empty state illustration */
+.empty {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.empty .empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty p {
+  margin-bottom: 16px;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.empty .btn { margin-top: 16px; }
+
+/* Gesture hint */
+.gesture-hint {
+  text-align: center;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+
+/* Hide gesture hint on desktop */
+@media (min-width: 769px) {
+  .gesture-hint {
+    display: none;
+  }
+}
+
+/* Settings section animation */
+.settings-section {
+  animation: sectionFadeIn 0.3s ease-out backwards;
+}
+
+.settings-section:nth-child(1) { animation-delay: 0.1s; }
+.settings-section:nth-child(2) { animation-delay: 0.15s; }
+.settings-section:nth-child(3) { animation-delay: 0.2s; }
+.settings-section:nth-child(4) { animation-delay: 0.25s; }
+.settings-section:nth-child(5) { animation-delay: 0.3s; }
+.settings-section:nth-child(6) { animation-delay: 0.35s; }
+
+@keyframes sectionFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 .tc-left {
   display: flex;

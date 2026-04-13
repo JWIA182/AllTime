@@ -1,5 +1,105 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { formatTime, formatTotal, haptic } from "../lib/formatters";
+
+// Inline swipe handler to avoid hook rules violation
+function TaskCard({ task, i, isActive, todayMs, timer, onEditTask, taskTodayMs }) {
+  const [swipeClass, setSwipeClass] = useState("");
+  
+  const handleTouchStart = useCallback((e) => {
+    task._startX = e.touches[0].clientX;
+    task._startY = e.touches[0].clientY;
+  }, [task]);
+
+  const handleTouchEnd = useCallback((e) => {
+    const deltaX = e.changedTouches[0].clientX - task._startX;
+    const deltaY = e.changedTouches[0].clientY - task._startY;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 60) {
+      if (deltaX > 0) {
+        // Swipe right - start/resume
+        setSwipeClass("swiped-right");
+        setTimeout(() => setSwipeClass(""), 300);
+        if (isActive && !timer.running) {
+          haptic("success");
+          timer.resume();
+        } else if (!isActive) {
+          haptic("success");
+          timer.startTask(task.id);
+        }
+      } else {
+        // Swipe left - pause/stop
+        setSwipeClass("swiped-left");
+        setTimeout(() => setSwipeClass(""), 300);
+        if (isActive && timer.running) {
+          haptic("warning");
+          timer.pause();
+        } else if (isActive) {
+          haptic("error");
+          timer.stopAndSave();
+        }
+      }
+    }
+  }, [task, isActive, timer]);
+
+  return (
+    <li
+      className={`task-card ${isActive ? "active" : ""} ${swipeClass}`}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      <div
+        className="tc-left"
+        onClick={() => onEditTask(task)}
+        role="button"
+        tabIndex={0}
+        aria-label={`Edit task ${task.name}`}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onEditTask(task); } }}
+      >
+        <span className="dot" style={{ background: task.color }} aria-hidden="true" />
+        <div className="tc-info">
+          <div className="tc-name">{task.name}</div>
+          <div className="tc-sub">
+            {isActive && timer.running ? (
+              <span className="running-badge">Running</span>
+            ) : todayMs > 0 ? (
+              `Today · ${formatTotal(todayMs)}`
+            ) : (
+              "No time today"
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="tc-right">
+        <span className="tc-num" aria-hidden="true">{i + 1}</span>
+        <span className="tc-time">
+          {isActive ? formatTime(timer.elapsed) : formatTotal(todayMs)}
+        </span>
+        {isActive && timer.running ? (
+          <button
+            className="play-btn"
+            onClick={() => { haptic("short"); timer.pause(); }}
+            aria-label={`Pause ${task.name}`}
+          >
+            ❚❚
+          </button>
+        ) : (
+          <button
+            className="play-btn"
+            onClick={() => {
+              haptic(isActive ? "medium" : "success");
+              isActive && !timer.running
+                ? timer.resume()
+                : timer.startTask(task.id);
+            }}
+            aria-label={`Start ${task.name}`}
+          >
+            ▶
+          </button>
+        )}
+      </div>
+    </li>
+  );
+}
 
 export default function TimerTab({
   tasks,
@@ -117,9 +217,13 @@ export default function TimerTab({
 
       {tasks.length === 0 ? (
         <div className="empty">
+          <div className="empty-icon" aria-hidden="true">📝</div>
           <p>no tasks yet</p>
+          <p style={{ fontSize: '11px', marginBottom: '20px', opacity: 0.7 }}>
+            create your first task to start tracking time
+          </p>
           <button className="btn primary" onClick={onNewTask}>
-            create your first task
+            + create task
           </button>
         </div>
       ) : (
@@ -128,65 +232,29 @@ export default function TimerTab({
             const isActive = task.id === timer.activeTaskId;
             const todayMs =
               (taskTodayMs[task.id] || 0) + (isActive ? timer.elapsed : 0);
+            
             return (
-              <li
+              <TaskCard
                 key={task.id}
-                className={`task-card ${isActive ? "active" : ""}`}
-              >
-                <div
-                  className="tc-left"
-                  onClick={() => onEditTask(task)}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`Edit task ${task.name}`}
-                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onEditTask(task); } }}
-                >
-                  <span className="dot" style={{ background: task.color }} aria-hidden="true" />
-                  <div className="tc-info">
-                    <div className="tc-name">{task.name}</div>
-                    <div className="tc-sub">
-                      {isActive && timer.running ? (
-                        <span className="running-badge">Running</span>
-                      ) : todayMs > 0 ? (
-                        `Today · ${formatTotal(todayMs)}`
-                      ) : (
-                        "No time today"
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className="tc-right">
-                  <span className="tc-num" aria-hidden="true">{i + 1}</span>
-                  <span className="tc-time">
-                    {isActive ? formatTime(timer.elapsed) : formatTotal(todayMs)}
-                  </span>
-                  {isActive && timer.running ? (
-                    <button
-                      className="play-btn"
-                      onClick={() => { haptic("short"); timer.pause(); }}
-                      aria-label={`Pause ${task.name}`}
-                    >
-                      ❚❚
-                    </button>
-                  ) : (
-                    <button
-                      className="play-btn"
-                      onClick={() => {
-                        haptic(isActive ? "medium" : "success");
-                        isActive && !timer.running
-                          ? timer.resume()
-                          : timer.startTask(task.id);
-                      }}
-                      aria-label={`Start ${task.name}`}
-                    >
-                      ▶
-                    </button>
-                  )}
-                </div>
-              </li>
+                task={task}
+                i={i}
+                isActive={isActive}
+                todayMs={todayMs}
+                timer={timer}
+                onEditTask={onEditTask}
+                taskTodayMs={taskTodayMs}
+              />
             );
           })}
         </ul>
+      )}
+
+      {/* Swipe gesture hint (mobile only) */}
+      {tasks.length > 0 && (
+        <div className="gesture-hint">
+          <span aria-hidden="true">👆</span>
+          <span>swipe right to start · swipe left to pause</span>
+        </div>
       )}
 
       {/* brain dump list */}

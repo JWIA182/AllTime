@@ -467,9 +467,13 @@ export default function InsightsTab({ tasks, sessions }) {
 
       {filtered.length === 0 && (
         <div className="empty">
+          <div className="empty-icon" aria-hidden="true">📊</div>
           <p>
             no sessions logged{" "}
             {period === "day" ? "today" : `this ${period}`}
+          </p>
+          <p style={{ fontSize: '11px', opacity: 0.7, marginTop: '8px' }}>
+            start tracking time to see your insights here
           </p>
         </div>
       )}
