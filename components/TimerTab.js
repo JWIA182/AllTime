@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
-import { formatTime, formatTotal, haptic } from "../lib/formatters";
+import { formatTime, formatTotal, haptic, isToday, startOfDay } from "../lib/formatters";
+import { calculateGoalProgress } from "../lib/goals";
 
 // Inline swipe handler to avoid hook rules violation
 function TaskCard({ task, i, isActive, todayMs, timer, onEditTask, taskTodayMs }) {
@@ -112,6 +113,9 @@ export default function TimerTab({
   showToast,
   onEditTask,
   onNewTask,
+  goals,
+  sessions,
+  onEditGoals,
 }) {
   const [dumpInput, setDumpInput] = useState("");
 
@@ -209,6 +213,50 @@ export default function TimerTab({
           </div>
         )}
       </div>
+
+      {/* goals progress */}
+      {goals.length > 0 && (
+        <div className="goals-section">
+          <div className="section-head">
+            <h2>GOALS</h2>
+            <button className="linkish" onClick={onEditGoals}>
+              edit
+            </button>
+          </div>
+          <div className="goals-list">
+            {goals.map((goal) => {
+              const periodStart = goal.period === "weekly"
+                ? new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+                : startOfDay(new Date());
+              
+              const progress = calculateGoalProgress(goal, sessions, periodStart);
+              
+              return (
+                <div key={goal.id} className="goal-card">
+                  <div className="goal-info">
+                    <div className="goal-name">{goal.taskName || "All Tasks"}</div>
+                    <div className="goal-meta">
+                      {progress.completedMinutes}m / {goal.targetMinutes}m · {goal.period}
+                    </div>
+                  </div>
+                  <div className="goal-progress-bar">
+                    <div
+                      className="goal-progress-fill"
+                      style={{
+                        width: `${progress.percent}%`,
+                        background: progress.completed ? "var(--accent)" : "var(--muted)",
+                      }}
+                    />
+                  </div>
+                  <div className="goal-percent">
+                    {progress.percent}%
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* task list */}
       <div className="section-head">

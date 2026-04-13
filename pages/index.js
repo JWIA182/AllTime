@@ -4,6 +4,7 @@ import ErrorBoundary from "../components/ErrorBoundary";
 import TaskEditor from "../components/TaskEditor";
 import TimerTab from "../components/TimerTab";
 import SyncStatusIndicator from "../components/SyncStatusIndicator";
+import GoalEditor from "../components/GoalEditor";
 import { useAuth } from "../lib/auth";
 import { colorForUser } from "../lib/colors";
 import { firebaseEnabled } from "../lib/firebase";
@@ -17,6 +18,7 @@ import {
   isStandalone,
   isToday,
 } from "../lib/formatters";
+import { subscribeGoals } from "../lib/goals";
 import {
   getPermissionState,
   notify,
@@ -125,8 +127,10 @@ function AppShell({ user }) {
   const [tab, setTab] = useState("timer");
   const [tasks, setTasks] = useState([]);
   const [sessions, setSessions] = useState([]);
+  const [goals, setGoals] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [taskEditorOpen, setTaskEditorOpen] = useState(false);
+  const [goalEditorOpen, setGoalEditorOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [showIOSBanner, setShowIOSBanner] = useState(false);
   const [onboarded, setOnboarded] = useState(true);
@@ -193,9 +197,11 @@ function AppShell({ user }) {
       }
     });
     const unsub2 = subscribeSessions(user.id, setSessions);
+    const unsub3 = subscribeGoals(user.id, setGoals);
     return () => {
       unsub1();
       unsub2();
+      unsub3();
     };
   }, [user.id]);
 
@@ -675,6 +681,8 @@ function AppShell({ user }) {
                 setEditingTask(null);
                 setTaskEditorOpen(true);
               }}
+              goals={goals}
+              onEditGoals={() => setGoalEditorOpen(true)}
             />
           </ErrorBoundary>
         )}
@@ -753,6 +761,17 @@ function AppShell({ user }) {
           user={user}
           task={editingTask}
           onClose={() => setTaskEditorOpen(false)}
+        />
+      )}
+
+      {/* goal editor modal */}
+      {goalEditorOpen && (
+        <GoalEditor
+          user={user}
+          tasks={tasks}
+          goals={goals}
+          showToast={showToast}
+          onClose={() => setGoalEditorOpen(false)}
         />
       )}
 

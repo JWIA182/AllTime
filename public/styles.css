@@ -809,6 +809,62 @@ ul { list-style: none; }
   }
 }
 
+/* Goals section */
+.goals-section {
+  margin-bottom: 20px;
+}
+
+.goals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.goal-card {
+  background: var(--bg);
+  border: 2px solid var(--line);
+  padding: 12px 14px;
+}
+
+.goal-info {
+  margin-bottom: 8px;
+}
+
+.goal-name {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.goal-meta {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.goal-progress-bar {
+  height: 6px;
+  background: var(--line-light);
+  overflow: hidden;
+}
+
+.goal-progress-fill {
+  height: 100%;
+  transition: width 0.5s ease, background 0.3s ease;
+}
+
+.goal-percent {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  text-align: right;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+}
+
 /* Settings section animation */
 .settings-section {
   animation: sectionFadeIn 0.3s ease-out backwards;
