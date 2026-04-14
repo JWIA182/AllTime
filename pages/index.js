@@ -32,6 +32,7 @@ import { useTimer } from "../lib/useTimer";
 import { useToast } from "../lib/useToast";
 import { useSyncStatus } from "../lib/useSyncStatus";
 import { useOfflineQueue } from "../lib/useOfflineQueue";
+import { useSwipeNavigation } from "../lib/useSwipeNavigation";
 
 // Lazy load heavy components
 const InsightsTab = lazy(() => import("../components/InsightsTab"));
@@ -459,6 +460,26 @@ function AppShell({ user }) {
     document.title = titles[tab] || "AllTime";
   }, [tab, timer.running]);
 
+  // Swipe navigation between tabs (mobile)
+  const tabOrder = ["timer", "insights", "tasks", "settings"];
+  const currentTabIndex = tabOrder.indexOf(tab);
+
+  const swipeNav = useSwipeNavigation({
+    onSwipeLeft: () => {
+      if (currentTabIndex < tabOrder.length - 1) {
+        haptic("short");
+        setTab(tabOrder[currentTabIndex + 1]);
+      }
+    },
+    onSwipeRight: () => {
+      if (currentTabIndex > 0) {
+        haptic("short");
+        setTab(tabOrder[currentTabIndex - 1]);
+      }
+    },
+    threshold: 80,
+  });
+
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-US", {
     weekday: "long",
@@ -659,7 +680,7 @@ function AppShell({ user }) {
       )}
 
       {/* tab content */}
-      <main className="tab-content">
+      <main className="tab-content" ref={swipeNav.containerRef}>
         {tab === "timer" && (
           <ErrorBoundary name="Timer">
             <TimerTab
