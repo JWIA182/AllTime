@@ -1961,9 +1961,15 @@ ul { list-style: none; }
     padding-top: max(16px, env(safe-area-inset-top, 44px)) !important;
   }
 
-  /* Better bottom nav positioning - clear home indicator */
+  /* Better bottom nav positioning - align to actual bottom */
   .bottom-nav {
-    padding-bottom: max(8px, env(safe-area-inset-bottom, 20px)) !important;
+    padding-bottom: 0 !important;
+    bottom: 0 !important;
+  }
+
+  /* Remove extra padding from app container on iOS */
+  .app {
+    padding-bottom: 0 !important;
   }
 
   /* Fix modal bottom edge - ensure it doesn't overlap home indicator */
